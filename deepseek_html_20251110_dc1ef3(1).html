@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zahteven BMI Kalkulator</title>
+    <style>
+        :root {
+            --primary-color: #4a6fa5;
+            --secondary-color: #6b8cbc;
+            --accent-color: #ff6b6b;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark-color);
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .content {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 20px;
+        }
+        
+        .input-section {
+            flex: 1;
+            min-width: 300px;
+            padding: 20px;
+        }
+        
+        .results-section {
+            flex: 1;
+            min-width: 300px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .bmi-result {
+            text-align: center;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            background-color: white;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+        }
+        
+        .bmi-value {
+            font-size: 3rem;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+        
+        .bmi-category {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .bmi-scale {
+            height: 20px;
+            background: linear-gradient(to right, var(--danger-color), var(--warning-color), var(--success-color), var(--warning-color), var(--danger-color));
+            border-radius: 10px;
+            margin: 20px 0;
+            position: relative;
+        }
+        
+        .bmi-marker {
+            position: absolute;
+            top: -5px;
+            width: 10px;
+            height: 30px;
+            background-color: var(--dark-color);
+            border-radius: 5px;
+            transform: translateX(-50%);
+        }
+        
+        .details {
+            margin-top: 20px;
+        }
+        
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .recommendations {
+            margin-top: 30px;
+            padding: 15px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+        }
+        
+        .recommendations h3 {
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+        
+        .gender-selector {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .gender-option {
+            flex: 1;
+            text-align: center;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .gender-option.selected {
+            border-color: var(--primary-color);
+            background-color: rgba(74, 111, 165, 0.1);
+        }
+        
+        .bmi-category.underweight {
+            color: var(--danger-color);
+        }
+        
+        .bmi-category.normal {
+            color: var(--success-color);
+        }
+        
+        .bmi-category.overweight {
+            color: var(--warning-color);
+        }
+        
+        .bmi-category.obese {
+            color: var(--danger-color);
+        }
+        
+        @media (max-width: 768px) {
+            .content {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>BMI Kalkulator</h1>
+            <p class="subtitle">Izračunajte svoj indeks telesne mase z upoštevanjem starosti in spola</p>
+        </header>
+        
+        <div class="content">
+            <section class="input-section">
+                <div class="form-group">
+                    <label for="gender">Spol</label>
+                    <div class="gender-selector">
+                        <div class="gender-option" id="male">Moški</div>
+                        <div class="gender-option selected" id="female">Ženska</div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="age">Starost</label>
+                    <input type="number" id="age" min="2" max="120" value="30">
+                </div>
+                
+                <div class="form-group">
+                    <label for="height">Višina (cm)</label>
+                    <input type="number" id="height" min="50" max="250" value="170">
+                </div>
+                
+                <div class="form-group">
+                    <label for="weight">Teža (kg)</label>
+                    <input type="number" id="weight" min="10" max="300" value="70">
+                </div>
+                
+                <div class="form-group">
+                    <label for="activity">Stopnja telesne aktivnosti</label>
+                    <select id="activity">
+                        <option value="1.2">Sedeči način življenja (malo ali brez vadbe)</option>
+                        <option value="1.375">Rahlo aktiven (lahka vadba 1-3 dni/teden)</option>
+                        <option value="1.55">Zmerno aktiven (zmerna vadba 3-5 dni/teden)</option>
+                        <option value="1.725">Zelo aktiven (težja vadba 6-7 dni/teden)</option>
+                        <option value="1.9">Ekstremno aktiven (zelo težka vadba, fizično delo)</option>
+                    </select>
+                </div>
+                
+                <button id="calculate">Izračunaj BMI</button>
+            </section>
+            
+            <section class="results-section">
+                <div class="bmi-result">
+                    <h2>Vaš BMI</h2>
+                    <div class="bmi-value" id="bmiValue">-</div>
+                    <div class="bmi-category" id="bmiCategory">-</div>
+                    
+                    <div class="bmi-scale">
+                        <div class="bmi-marker" id="bmiMarker"></div>
+                    </div>
+                    
+                    <div class="bmi-labels">
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>16</span>
+                            <span>18.5</span>
+                            <span>25</span>
+                            <span>30</span>
+                            <span>40</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="details">
+                    <h3>Podrobnosti</h3>
+                    <div class="detail-item">
+                        <span>Normalno območje BMI:</span>
+                        <span>18.5 - 24.9</span>
+                    </div>
+                    <div class="detail-item">
+                        <span>Vaša idealna teža:</span>
+                        <span id="idealWeight">-</span>
+                    </div>
+                    <div class="detail-item">
+                        <span>Dnevna potreba po kalorijah:</span>
+                        <span id="calories">-</span>
+                    </div>
+                    <div class="detail-item">
+                        <span>Telesna maščoba (ocena):</span>
+                        <span id="bodyFat">-</span>
+                    </div>
+                </div>
+                
+                <div class="recommendations">
+                    <h3>Priporočila</h3>
+                    <p id="recommendationsText">Vnesite svoje podatke za priporočila.</p>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const genderOptions = document.querySelectorAll('.gender-option');
+            const calculateButton = document.getElementById('calculate');
+            const bmiValue = document.getElementById('bmiValue');
+            const bmiCategory = document.getElementById('bmiCategory');
+            const bmiMarker = document.getElementById('bmiMarker');
+            const idealWeight = document.getElementById('idealWeight');
+            const calories = document.getElementById('calories');
+            const bodyFat = document.getElementById('bodyFat');
+            const recommendationsText = document.getElementById('recommendationsText');
+            
+            let selectedGender = 'female';
+            
+            // Izbor spola
+            genderOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    genderOptions.forEach(opt => opt.classList.remove('selected'));
+                    this.classList.add('selected');
+                    selectedGender = this.id;
+                });
+            });
+            
+            // Izračun BMI
+            calculateButton.addEventListener('click', function() {
+                const age = parseInt(document.getElementById('age').value);
+                const height = parseInt(document.getElementById('height').value);
+                const weight = parseInt(document.getElementById('weight').value);
+                const activity = parseFloat(document.getElementById('activity').value);
+                
+                if (!age || !height || !weight) {
+                    alert('Prosimo, vnesite vse podatke.');
+                    return;
+                }
+                
+                // Izračun BMI
+                const heightInMeters = height / 100;
+                const bmi = weight / (heightInMeters * heightInMeters);
+                const roundedBmi = bmi.toFixed(1);
+                
+                // Določitev kategorije BMI
+                let category, categoryClass;
+                if (bmi < 16) {
+                    category = 'Huda podhranjenost';
+                    categoryClass = 'underweight';
+                } else if (bmi >= 16 && bmi < 17) {
+                    category = 'Zmerna podhranjenost';
+                    categoryClass = 'underweight';
+                } else if (bmi >= 17 && bmi < 18.5) {
+                    category = 'Blaga podhranjenost';
+                    categoryClass = 'underweight';
+                } else if (bmi >= 18.5 && bmi < 25) {
+                    category = 'Normalna teža';
+                    categoryClass = 'normal';
+                } else if (bmi >= 25 && bmi < 30) {
+                    category = 'Prekomerna teža';
+                    categoryClass = 'overweight';
+                } else if (bmi >= 30 && bmi < 35) {
+                    category = 'Debelost 1. stopnje';
+                    categoryClass = 'obese';
+                } else if (bmi >= 35 && bmi < 40) {
+                    category = 'Debelost 2. stopnje';
+                    categoryClass = 'obese';
+                } else {
+                    category = 'Debelost 3. stopnje';
+                    categoryClass = 'obese';
+                }
+                
+                // Prikaz rezultatov
+                bmiValue.textContent = roundedBmi;
+                bmiCategory.textContent = category;
+                bmiCategory.className = 'bmi-category ' + categoryClass;
+                
+                // Premikanje markerja na lestvici BMI
+                let markerPosition = ((bmi - 16) / (40 - 16)) * 100;
+                if (markerPosition < 0) markerPosition = 0;
+                if (markerPosition > 100) markerPosition = 100;
+                bmiMarker.style.left = markerPosition + '%';
+                
+                // Izračun idealne teže (po formuli Devine)
+                let idealWeightValue;
+                if (selectedGender === 'male') {
+                    idealWeightValue = 50 + 0.9 * (height - 152);
+                } else {
+                    idealWeightValue = 45.5 + 0.9 * (height - 152);
+                }
+                idealWeight.textContent = idealWeightValue.toFixed(1) + ' kg';
+                
+                // Izračun dnevne potrebe po kalorijah (BMR * aktivnost)
+                let bmr;
+                if (selectedGender === 'male') {
+                    bmr = 10 * weight + 6.25 * height - 5 * age + 5;
+                } else {
+                    bmr = 10 * weight + 6.25 * height - 5 * age - 161;
+                }
+                const dailyCalories = Math.round(bmr * activity);
+                calories.textContent = dailyCalories + ' kcal';
+                
+                // Ocenjen odstotek telesne maščobe
+                let bodyFatPercentage;
+                if (selectedGender === 'male') {
+                    bodyFatPercentage = (1.20 * bmi) + (0.23 * age) - 16.2;
+                } else {
+                    bodyFatPercentage = (1.20 * bmi) + (0.23 * age) - 5.4;
+                }
+                bodyFat.textContent = bodyFatPercentage.toFixed(1) + '%';
+                
+                // Priporočila glede na BMI
+                let recommendations = '';
+                if (bmi < 18.5) {
+                    recommendations = 'Vaš BMI kaže na podhranjenost. Priporočamo povečanje vnosa hranil, zlasti beljakovin in zdravih maščob. Posvetujte se z zdravnikom ali nutricionistom za ustrezno prehrano.';
+                } else if (bmi >= 18.5 && bmi < 25) {
+                    recommendations = 'Čestitamo! Vaš BMI je v normalnem območju. Ohranjajte zdrave prehranjevalne navade in redno telesno aktivnost za vzdrževanje zdrave teže.';
+                } else if (bmi >= 25 && bmi < 30) {
+                    recommendations = 'Vaš BMI kaže na prekomerno težo. Priporočamo zmerno zmanjšanje vnosa kalorij in povečanje telesne aktivnosti. Osredotočite se na uravnoteženo prehrano z veliko zelenjave, sadja in celih žit.';
+                } else {
+                    recommendations = 'Vaš BMI kaže na debelost. Priporočamo posvet z zdravnikom ali nutricionistom za varno in učinkovito izgubo teže. Redna telesna aktivnost in uravnotežena prehrana sta ključnega pomena.';
+                }
+                
+                recommendationsText.textContent = recommendations;
+            });
+            
+            // Samodejni izračun ob nalaganju strani
+            calculateButton.click();
+        });
+    </script>
+</body>
+</html>
